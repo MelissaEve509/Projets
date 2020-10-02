@@ -1,0 +1,267 @@
+---
+title: "PROJET - ADD"
+author: "Mélissa Eveillard - Kenzo Ramdani"
+date: "10/01/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(readxl)
+```
+
+Nous travaillons avec le jeu de données *Heart Disease* qui regroupe des informations médicales de 303 patients vivant aux Etats-Unis. Ces données sont extraites d'un plus grand ensemble de données provenant de la *Cleveland Database*. Afin de pouvoir analyse ce jeu de données nous nous servons de la librairie **tidyverse** que nous avons importé ci-dessus.
+
+A l'aide de la fonction `read_csv` nous importons notre jeu de données:
+```{r message=FALSE, warning=FALSE}
+heart = read_csv("~/heart.csv", col_names = T)
+```
+Ci-dessous un aperçu de ce jeu de données:
+```{r}
+heart %>% head(10)
+```
+Cette base de données contient `r heart %>% nrow` individus et `r heart %>% ncol ` variables qui sont détailles ci-dessus:
+
+```{r}
+heart %>% glimpse
+```
+
+Les variables sont les suivantes:
+
+- **age** : Correspond à l'âge de l'individu
+- **sex**: Affiche le sexe de l'individu au format suivant (1 = homme / 2 = femme)
+- **cp**: Correspond au type de douleur thoracique ressenti par l'individu en utilisant le format suivant: 
+1 = angine de poitrine typique
+2 = angine de poitrine atypique
+3 = douleur non angulaire
+4 = asymptotique
+- **trestbps**: Correspond à la pression artérielle au repos de l'individu (en en mmHg)
+- **chol**: Correspond au cholesterol sérique (en mg/dl)
+- **fbs**: Correspond à la valeur de la glycémie à jeun d'un indivdu
+(= 1 si la glycémie à jeun > 120 mg/dl, 0 sinon)
+- **restecg**: Affiche les résultats électrocardiographiques au repos
+0 = normal
+1 = présente une anomalie 
+2 = hyperthrophie ventriculaire gauche
+- **thalach**: Affiche la fréquence cardiaque maximale atteinte par un individu
+- **exang**: Angine de poitrine provoqué par l'exercice physique :
+1 = oui
+0 = non
+- **oldpeak** = Correspond à la valeur de la dépression ST induite par l'exercice relatif au repos 
+- **slope**: Correspond à la pente du segment ST d'exercice
+maximal et vaut:
+1 = pente ascendante
+2 = plat
+3 = pente descendante
+- **ca**: Correpond au nombre de vaisseaux principaux (0–3) colorés par fluoroscence
+- **thal** : affiche la thalassémie (défault du sang)
+3 = normal
+6 = défault fixe
+7 = défault réversible
+- **target**: Indique si la personne souffre d'une maladie cardiaque ou non:
+0 = absence
+1 = présente
+
+
+Nous vérifions à présent si notre jeu de données contient des valeurs manquantes ou non.
+```{r}
+heart %>% is.na() %>% sum
+```
+
+Nous constatons que dans notre base de données les noms des variables sont peu compréhensible et les libéllés imprécis, nous modifions donc le jeu de données en renommant les valeurs des variables afin de le rendre plus lisible et compréhensible.
+
+```{r}
+heart <- heart %>% 
+  mutate(sex = if_else(sex == 1, "homme", "femme"),
+         fbs = if_else(fbs == 1, ">120", "<=120"),
+         exang = if_else(exang == 1, "oui" ,"non"),
+         cp = if_else(cp == 1, "angine typique",
+                      if_else(cp == 2, "angine atypique",
+                              if_else(cp == 3,"douleur non angulaire","asymptotique"))),
+         restecg = if_else(restecg == 0, "normal",
+                           if_else(restecg == 1, "anomalie", "hypertrophie")),
+         slope = if_else(slope == 1, "ascendante",
+                         if_else(slope == 2, "plat", "descendante")),
+         ca = as.factor(ca),
+         thal = if_else(thal == 3, "normal",
+                        if_else(thal == 6, "défaut fixe", "défaut réversible")),
+         target = if_else(target == 1, "oui", "non")
+         )
+
+```
+
+Nous renommons aussi les variables afin qu'elle soit plus cohérente.
+
+```{r}
+heart = heart %>%
+  rename("type_douleur_thoracique" = cp,
+         "pression_arterielle_repos" = trestbps,
+         "sucre" = fbs,
+         "resultat_ecg_repos" = restecg,
+         "freq_cardiaque_max" = thalach,
+         "angine" = exang,
+         "depression" = oldpeak,
+         "pente_segmentST_exercice_max" = slope,
+         "nb_vaisseaux" = ca
+         )
+```
+On réordonne l'ordre des variables en mettant les plus essentielles à l'analyse en avant:
+
+```{r}
+heart %>% select(target, sex, freq_cardiaque_max, sucre, angine, type_douleur_thoracique, resultat_ecg_repos, everything())
+```
+
+
+A présent que notre jeu de données est bien préparée nous pouvons faire quelques graphiques afin de l'illustrer.
+Le graphique ci-dessous nous montre le nombre d'individus qui ont une maladie cardiaque ou non:
+
+```{r}
+
+ggplot(heart, aes(x=heart$target, fill=heart$target)) + 
+  geom_bar() +
+  xlab("Maladie cardiaque") +
+  ylab("") +
+  ggtitle("Analyse de la présence ou non d'une maladie cardiaque") +
+  scale_fill_discrete(name = "Maladie cardiaque", labels = c("Absence", "Presence")) +
+  theme_bw()+
+  theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, size = 16))
+  
+
+
+```
+On constate que 165 personnes de notre jeu de données sont atteints d'une maladie cardiaque. 
+Si l'on s'intéresse au nombre de malades selon le sexe des individus nous constatons que ce sont les hommes qui sont le plus atteints par la maladie pusqi'ils sont 93, contre 72 femmes, à être malade.
+
+```{r}
+heart %>% group_by(sex) %>% filter(target == "oui") %>% count()
+```
+
+On regarde à présent l'âge des individus
+```{r}
+ggplot(heart, aes(x=age)) + 
+  geom_histogram(binwidth = 1) + 
+  ylab("") +
+  ggtitle("Histogramme de l'âge")+
+  theme_bw()
+```
+
+```{r}
+## Moyenne d'age par sexe 
+heart %>% group_by(sex) %>% summarise(moyenne_age = mean(age))
+```
+Bien que ce soient les hommes qui sont le plus touché par une maladie cardique, ils sont en moyenne légèrmeent plus jeune que les femmes (53 ans contre 55 ans)
+
+
+
+
+
+(....)
+
+Nous décidons de recoder la variable *age* et de la décomposer en 3 classes qui sont : 
+- Jeune: Personne agée entre 29 et 40 ans 
+- Adulte: Persoone agée entre 40 et 55 ans 
+- Personne agée: Personne ayant plus de 55 ans 
+
+On vérifie qu'il y ait assez d'individus dans chaque classe.
+
+```{r}
+heart %>% filter(age >= 29 & age < 40) %>% count()
+```
+16 patients sont agés entre 29 et 40 ans.
+```{r}
+heart %>% filter(age >= 40 & age < 55) %>% count()
+
+```
+128 patients sont agés entre 40 et 55 ans.
+```{r}
+heart %>% filter(age > 55) %>% count()
+
+```
+151 patients sont agés de plus de 55 ans.
+
+
+Nous pouvons donc créer cette nouvelle variable *cAge*
+```{r}
+heart = heart %>% mutate(cAge = if_else(age>=29 & age < 40, "jeune",
+                                if_else(age >=40 & age < 55, "adulte", "personne agée")))
+```
+
+En fonction de cette nouvelle variable nous allons regarder le nombre de malades par catégorie d'âge:
+
+```{r}
+heart %>% group_by(cAge) %>% filter(target == "oui") %>% count()
+
+```
+
+Ainsi, on constate que ce sont les adultes (88 personnes) qui sont les plus nombreux à être atteints d'une maladie cardiaque.
+On peut représenter cela par un diagramme en barres (...)
+
+
+Si l'on s'interesse aux autres caractéristuqies concernant la santé physique des patients nous constatons, grâce à la requête ci-dessous que les mlaades ont en moyenne une fréquence cardiaque maximale au repos plus elevé (158.47 bpm) que celle des non malades (139.10 bpm)
+
+
+```{r}
+## Moyenne freq cardiaque par malade
+heart %>%
+  group_by(target) %>%
+  summarise(moyenne_freq_cardiaque = mean(freq_cardiaque_max))
+```
+
+
+```{r}
+## plot age + freq cardiaque  
+ggplot(data = heart)+
+  geom_point(aes(x = age, y = freq_cardiaque_max))+
+  theme_bw()+
+  ggtitle("Nuage de points de la fréquence cardiaque en fonction de l'âge")
+```
+Egalament, la fréquence cardiaque maximale au repose semble dépendre de l'âge puisque l'on peut constater une tendance où l'on voit que plus l'âge augmente et plus la fréquence cardiaqeu diminue.
+
+```{r}
+## Frequence cardiaque par groupe d'age 
+
+ggplot(data = heart, aes(fill = cAge))+
+  geom_boxplot(aes(y = freq_cardiaque_max))+
+  facet_grid(~cAge)+
+  theme_bw()+
+  theme(legend.position="none")
+
+```
+
+```{r}
+heart %>% group_by(cAge) %>% summarise(quantile = quantile(freq_cardiaque_max, 0.5))
+```
+
+Ce graphique ci-dessus nous permet de comparer la fréquence cardiaque maximale selon les différents groupes d'âges crées précedemment. Ainsi, on constate que ce sont les jeunes qui ont une fréquence cardiaque maximale la plus elevée; en effet, 50% des jeunes ont une fréquence cardiaque de plus de 174 bpm, cette valeur atteint 160 bpm chez les adultes et concernant les personnes agées , la moitié d'entre eux ont une fréquence cardiaque de moins 145 bpm. 
+Cette représenation nous permet de voir la baisse des conditions physiques des individus lorsqu'ils vieillissent.
+
+
+```{r}
+## Moyenne cholesterol par malade
+heart %>%
+  group_by(target) %>%
+  summarise(moyenne_chol = mean(chol))
+```
+Concernant le taux de cholestérol, celui-ci est en moyenne plus élevé chez les non malades (251 mg/dl) que chez les malades (242 mg/dl).
+
+
+```{r}
+graph<-heart %>% ggplot(aes(x=age,y=chol,col=sex, size=chol))+
+  geom_point(alpha=0.7)+xlab("Age") + 
+  ylab("Cholestoral") +
+  guides(fill = guide_legend(title = "Gender"))+
+ theme(plot.margin = margin(0.1,.1,.1,.1, "cm"))+ 
+  theme_bw()
+graph
+
+```
+Ce graphique nous permet de comparer le taux de cholesterol en fonction du sexe et de l'âge des patients. Ainsi, nous pouvons voir que ce taux est de plsu en en plus élevé à mesure que l'a^ge augmente.
+et les femmes semblent ^tre celles qui ont les taux les plus eleve 

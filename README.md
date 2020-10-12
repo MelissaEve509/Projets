@@ -10,6 +10,6 @@ This reposirory contains all the projects completed by me for academics or self 
 
 # Contents 
 
-- <a href = "https://github.com/MelissaEve509/Projets/blob/master/Projet%20-%20EVEILLARD%20(1).ipynb">Analyse des transactions de paiement sur les horodateurs parisiens en 2014</a>
+- <a href = "https://github.com/MelissaEve509/Projets/blob/master/Projet%20-%20EVEILLARD%20(1).ipynb" target ="_blank">Analyse des transactions de paiement sur les horodateurs parisiens en 2014</a>
 
-- <a href = "https://github.com/MelissaEve509/Projets/blob/master/DM_Melissa_Eveillard.pdf"> Arbre de décision en utilisant des jeux de données de R </a>
+- <a href = "https://github.com/MelissaEve509/Projets/blob/master/DM_Melissa_Eveillard.pdf" target = "_blank"> Arbre de décision en utilisant des jeux de données de R </a>

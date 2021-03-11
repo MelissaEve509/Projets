@@ -15,3 +15,6 @@ This reposirory contains all the projects completed by me for academics or self 
 - <a href = "https://github.com/MelissaEve509/Projets/blob/master/DM_Melissa_Eveillard.pdf" target = "_blank"> Arbre de décision en utilisant des jeux de données de R </a>
 
 - <a href= "https://github.com/MelissaEve509/Projets/blob/master/notebook.ipynb" target = "_blank"> Analyse des données concernant le nombre de cas de Covid-19 dans le monde (Projet guidé sur DataCamp)   </a>
+
+
+- <a href= "https://github.com/MelissaEve509/Projets/blob/master/AnalysingTVData.ipynb" target = "_blank"> Analyse des données concernant le Super Bowl (Projet guidé sur DataCamp)  </a>

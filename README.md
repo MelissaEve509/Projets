@@ -10,9 +10,7 @@ This reposirory contains all the projects completed by me for academics or self 
 
 # Contents 
 
-- -
-- 
-- <a href = " " Analyse des données du naufrage du Titanic et prédiction de la survie des passagers à l'aide de la classification naîve bayésienne. 
+- <a href = "https://github.com/MelissaEve509/Projets/blob/master/ProjetEveillarRamdani.pdf"  target="_blank"> Analyse des données du naufrage du Titanic et prédiction de la survie des passagers à l'aide de la classification naîve bayésienne </a>
 
 - <a href = "https://github.com/MelissaEve509/Projets/blob/master/ProjetTutore_Eveillard_Queric.pdf" target="_blank"> Etude d'un modèle aléatoire basé sur les chaînes de Markov </a>
 
